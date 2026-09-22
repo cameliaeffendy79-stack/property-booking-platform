@@ -35,7 +35,8 @@ export default function TransactionReport() {
   );
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const { data: properties = [] } = useTenantProperties();
+  const { data: propertiesResponse } = useTenantProperties();
+  const properties = propertiesResponse?.items ?? [];
 
   const [sortBy, setSortBy] = useState<
     "created_at" | "booking_code" | "status" | "total_price"

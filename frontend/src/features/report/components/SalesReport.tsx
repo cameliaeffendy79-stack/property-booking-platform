@@ -34,7 +34,8 @@ export default function SalesReport() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [search, setSearch] = useState("");
-  const { data: properties = [] } = useTenantProperties();
+  const { data: propertiesResponse } = useTenantProperties();
+  const properties = propertiesResponse?.items ?? [];
 
   const [sortBy, setSortBy] = useState<
     "check_in" | "created_at" | "total_price"

@@ -102,7 +102,8 @@ export default function PropertyReport() {
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [year, setYear] = useState(today.getFullYear());
 
-  const { data: properties = [] } = useTenantProperties();
+  const { data: propertiesResponse } = useTenantProperties();
+  const properties = propertiesResponse?.items ?? [];
 
   const { data, isLoading, isError } = usePropertyReport({ propertyId, month, year });
 

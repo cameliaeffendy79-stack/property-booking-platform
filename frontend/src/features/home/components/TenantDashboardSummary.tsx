@@ -8,7 +8,6 @@ import {
 import { Link } from "react-router-dom";
 
 import SurfaceCard from "@/components/layout/SurfaceCard";
-
 import { useTenantProperties } from "@/features/property/hooks/useTenantProperties";
 import { useTenantTransactions } from "@/features/payment/hooks/useTenantTransaction";
 import { useSalesReport } from "@/features/report/hooks/useReport";
@@ -32,9 +31,12 @@ const salesQuery = {
 
 export default function TenantDashboardSummary() {
   const {
-    data: properties = [],
+    data: propertiesResponse,
     isLoading: isPropertiesLoading,
-  } = useTenantProperties();
+  } = useTenantProperties({
+    page: 1,
+    pageSize: 1,
+  });
 
   const {
     data: transactionResponse,
@@ -50,6 +52,9 @@ export default function TenantDashboardSummary() {
     data: reviews = [],
     isLoading: isReviewsLoading,
   } = useTenantReviews();
+
+  const propertyTotal =
+    propertiesResponse?.pagination.totalItems ?? 0;
 
   const transactionTotal =
     transactionResponse?.pagination.total ?? 0;
@@ -82,7 +87,7 @@ export default function TenantDashboardSummary() {
             <p className="mt-2 text-2xl font-semibold text-slate-text">
               {isPropertiesLoading
                 ? "—"
-                : properties.length}
+                : propertyTotal}
             </p>
           </div>
 
