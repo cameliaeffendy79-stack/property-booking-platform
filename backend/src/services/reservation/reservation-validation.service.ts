@@ -1,7 +1,10 @@
 import { rooms } from "../../generated/prisma/client";
 import { CreateReservationDto } from "../../types/dto";
 import { ApiError } from "../../utils";
-import {AvailabilityRepository,RoomRepository}from "../../repositories";
+import {
+  AvailabilityRepository,
+  RoomRepository,
+} from "../../repositories";
 import { ReservationComplete } from "../../types/prisma";
 
 export class ReservationValidationService {
@@ -49,11 +52,12 @@ export class ReservationValidationService {
     dto: CreateReservationDto
   ): Promise<void> {
     const availabilities =
-      await this.availabilityRepository.findManyByRoomIdAndDateRange(
-        dto.roomId,
-        dto.checkInDate,
-        dto.checkOutDate
-      );
+      await this.availabilityRepository
+        .findManyByRoomIdAndDateRange(
+          dto.roomId,
+          dto.checkInDate,
+          dto.checkOutDate
+        );
 
     if (availabilities.length === 0) {
       throw new ApiError(
@@ -102,13 +106,39 @@ export class ReservationValidationService {
     }
   }
 
+  validateTenantOwnership(
+    tenantId: number,
+    propertyTenantId: bigint
+  ): void {
+    if (
+      BigInt(tenantId) !==
+      propertyTenantId
+    ) {
+      throw new ApiError(
+        403,
+        "You are not authorized to manage this reservation."
+      );
+    }
+  }
+
   validateReservationCanBeCancelled(
     status: string | null
   ): void {
     if (status !== "WAITING_PAYMENT") {
       throw new ApiError(
-        400,
+        409,
         "Reservation cannot be cancelled."
+      );
+    }
+  }
+
+  validateTenantCanCancelPayment(
+    paymentProof: string | null | undefined
+  ): void {
+    if (paymentProof) {
+      throw new ApiError(
+        409,
+        "Reservation cannot be cancelled because payment proof has already been uploaded."
       );
     }
   }

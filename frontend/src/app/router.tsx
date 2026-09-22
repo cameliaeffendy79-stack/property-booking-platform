@@ -35,6 +35,7 @@ import ReviewPage from "@/pages/review/ReviewPage";
 // Pages: Tenant Protected
 import TenantTransactionPage from "@/pages/payment/TenantTransactionPage";
 import ReportPage from "@/pages/report/ReportPage";
+import TenantReviewPage from "@/pages/review/TenantReviewPage";
 
 // Router Config & Components
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
@@ -152,6 +153,17 @@ export default function AppRouter() {
           element={
             <RoleRoute allowedRoles={[user_role.TENANT]}>
               <TenantPropertyPage />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/tenant/reviews"
+          element={
+            <RoleRoute
+              allowedRoles={[user_role.TENANT]}
+            >
+              <TenantReviewPage />
             </RoleRoute>
           }
         />

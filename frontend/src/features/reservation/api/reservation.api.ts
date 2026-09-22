@@ -34,3 +34,13 @@ export const cancelReservation = async (
 
   return response.data;
 };
+
+export const cancelTenantReservation = async (
+  reservationId: number,
+) => {
+  const response = await api.patch(
+    `/reservations/${reservationId}/tenant-cancel`,
+  );
+
+  return response.data;
+};

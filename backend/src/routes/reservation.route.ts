@@ -6,6 +6,7 @@ import { user_role } from "../generated/prisma/enums";
 
 const router = Router();
 
+
 router.use(
   authenticate,
   authorize(user_role.CUSTOMER)
@@ -32,6 +33,13 @@ router.get(
 router.patch(
   "/:id/cancel",
   reservationController.cancelReservation
+);
+
+router.patch(
+  "/:id/tenant-cancel",
+  authenticate,
+  authorize(user_role.TENANT),
+  reservationController.tenantCancelReservation
 );
 
 export default router;

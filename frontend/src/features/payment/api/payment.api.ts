@@ -62,3 +62,4 @@ export const rejectPayment = async (
 
   return response.data.data;
 };
+

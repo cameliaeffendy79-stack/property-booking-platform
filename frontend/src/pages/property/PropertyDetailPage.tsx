@@ -468,8 +468,7 @@ export default function PropertyDetailPage() {
     <div className="flex min-h-screen flex-col bg-surface">
       <HomeNavbar />
 
-      <main className="mx-auto w-full max-w-[1200px] flex-1 px-5 py-7 sm:px-6 lg:px-8">
-        {/* Back */}
+        <main className="mx-auto w-full max-w-[1200px] flex-1 px-5 pb-28 pt-7 sm:px-6 sm:pb-28 lg:px-8 lg:py-7">        {/* Back */}
         <button
           type="button"
           onClick={() => navigate("/properties")}

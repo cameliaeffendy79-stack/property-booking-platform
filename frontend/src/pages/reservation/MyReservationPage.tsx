@@ -188,25 +188,66 @@ export default function MyReservationsPage() {
                   </p>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
-                  <div>
-                    <span className="block text-[10px] text-slate-muted">
-                      Total Price
-                    </span>
+        <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+  <div>
+    <span className="block text-[10px] text-slate-muted">
+      Total Price
+    </span>
 
-                    <span className="text-sm font-bold text-midnight-indigo">
-                      Rp{" "}
-                      {new Intl.NumberFormat("id-ID").format(
-                        Number(item.totalPrice)
-                      )}
-                    </span>
-                  </div>
+    <span className="text-sm font-bold text-midnight-indigo">
+      Rp{" "}
+      {new Intl.NumberFormat("id-ID").format(
+        Number(item.totalPrice)
+      )}
+    </span>
+  </div>
 
-                  <div className="flex items-center text-xs font-semibold text-midnight-indigo transition-transform group-hover:translate-x-1">
-                    <span>Details</span>
-                    <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                  </div>
-                </div>
+  <div className="flex items-center gap-3">
+    {item.reservationStatus === "COMPLETED" && !item.review && (
+  <button
+    type="button"
+    onClick={(event) => {
+      event.stopPropagation();
+      navigate(`/reviews/${item.id}`);
+    }}
+    className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+  >
+    Review
+  </button>
+)}
+
+{item.reservationStatus === "COMPLETED" && item.review && (
+  <div className="flex gap-2">
+    <button
+      type="button"
+      onClick={(event) => {
+        event.stopPropagation();
+        navigate(`/reviews/${item.id}`);
+      }}
+      className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+    >
+      Review Details
+    </button>
+
+    <button
+      type="button"
+      onClick={(event) => {
+        event.stopPropagation();
+        navigate(`/reviews/${item.id}?edit=true`);
+      }}
+      className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+    >
+      Edit Review
+    </button>
+  </div>
+)}
+
+        <div className="flex items-center text-xs font-semibold text-midnight-indigo transition-transform group-hover:translate-x-1">
+          <span>Details</span>
+          <ArrowRight className="ml-1 h-3.5 w-3.5" />
+        </div>
+      </div>
+    </div>
               </div>
             ))}
           </div>

@@ -158,6 +158,49 @@ export default function ReservationDetailPage() {
                 Payment Summary
             </h2>
 
+            {reservation.review && (
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-base font-semibold text-slate-900">
+              Your Review
+            </h2>
+
+            <div className="mb-3 flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <span
+                  key={index}
+                  className={
+                    index < reservation.review!.rating
+                      ? "text-yellow-400"
+                      : "text-slate-300"
+                  }
+                >
+                  ★
+                </span>
+              ))}
+
+              <span className="ml-2 text-sm font-medium text-slate-600">
+                {reservation.review.rating}/5
+              </span>
+            </div>
+
+            <p className="text-sm leading-6 text-slate-700">
+              {reservation.review.comment}
+            </p>
+
+            {reservation.review.tenantReply && (
+              <div className="mt-5 rounded-lg bg-slate-50 p-4">
+                <p className="text-xs font-semibold text-slate-500">
+                  Property Response
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-slate-700">
+                  {reservation.review.tenantReply}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
 
 
         {reservation.paymentProof && (
@@ -213,19 +256,43 @@ export default function ReservationDetailPage() {
               </button>
             </div>
           )}
-          {reservation.reservationStatus === "COMPLETED" && (
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() =>
-                navigate(`/reviews/${reservation.id}`)
-              }
-              className="rounded-lg bg-midnight-indigo px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90"
-            >
-              Write a Review
-            </button>
-          </div>
-        )}
+             {reservation.reservationStatus === "COMPLETED" && (
+            reservation.review ? (
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(`/reviews/${reservation.id}`)
+                  }
+                  className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                >
+                  Review Details
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(`/reviews/${reservation.id}/edit`)
+                  }
+                  className="rounded-lg bg-midnight-indigo px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
+                >
+                  Edit Review
+                </button>
+              </div>
+            ) : (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(`/reviews/${reservation.id}`)
+                  }
+                  className="rounded-lg bg-midnight-indigo px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
+                >
+                  Write a Review
+                </button>
+              </div>
+            )
+          )}
         </div>
       </main>
 

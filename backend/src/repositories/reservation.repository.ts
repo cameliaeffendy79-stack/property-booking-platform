@@ -363,6 +363,22 @@ async cancelReservationWithTransaction(
   });
 }
 
+async completeReservation(
+  reservationId: number,
+  completedAt: Date
+): Promise<reservations> {
+  return prisma.reservations.update({
+    where: {
+      id: BigInt(reservationId),
+    },
+
+    data: {
+      status: reservation_status.COMPLETED,
+      completed_at: completedAt,
+    },
+  });
+}
+
 async findTenantTransactions(
   tenantId: number,
   query: TenantTransactionQueryDto
@@ -501,6 +517,79 @@ async findConfirmedReservationsForReminder(
 
     orderBy: {
       check_in: "asc",
+    },
+  });
+}
+
+async findConfirmedReservationsForCompletion(
+  checkoutDate: Date
+): Promise<ReservationComplete[]> {
+  return prisma.reservations.findMany({
+    where: {
+      status: reservation_status.CONFIRMED,
+      check_out: {
+        lte: checkoutDate,
+      },
+    },
+
+    include: {
+      users: true,
+
+      rooms: {
+        include: {
+          properties: {
+            include: {
+              users: {
+                include: {
+                  tenant_profiles: true,
+                },
+              },
+            },
+          },
+        },
+      },
+
+      payments: true,
+
+      reviews: true,
+    },
+
+    orderBy: {
+      check_out: "asc",
+    },
+  });
+}
+
+async findExpiredWaitingPaymentReservations(
+  now: Date
+): Promise<ReservationComplete[]> {
+  return prisma.reservations.findMany({
+    where: {
+      status: reservation_status.WAITING_PAYMENT,
+      booking_expired_at: {
+        lte: now,
+      },
+    },
+    include: {
+      users: true,
+      rooms: {
+        include: {
+          properties: {
+            include: {
+              users: {
+                include: {
+                  tenant_profiles: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      payments: true,
+      reviews: true,
+    },
+    orderBy: {
+      booking_expired_at: "asc",
     },
   });
 }

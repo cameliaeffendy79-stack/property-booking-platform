@@ -107,6 +107,31 @@ export class ReservationController {
       );
     }
   );
+
+  tenantCancelReservation = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { reservationId } =
+      reservationIdSchema.parse({
+        reservationId: Number(req.params.id),
+      });
+
+    const tenantId = Number(req.user!.id);
+
+    const result =
+      await reservationService.tenantCancelReservation(
+        tenantId,
+        reservationId
+      );
+
+    return res.status(200).json(
+      new ApiResponse(
+        true,
+        result.message,
+        result.data
+      )
+    );
+  }
+);
 }
 
 export const reservationController =

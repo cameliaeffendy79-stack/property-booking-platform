@@ -189,6 +189,48 @@ async cancelReservation(
   return this.mapperService.buildCancelReservationResponse(
     cancelledReservation
   );
+
+  
+}
+
+async tenantCancelReservation(
+  tenantId: number,
+  reservationId: number
+): Promise<CancelReservationResponseDto> {
+  const reservation =
+    await this.reservationRepository.findCompleteById(
+      reservationId
+    );
+
+  this.validationService.validateReservationExists(
+    reservation
+  );
+
+  this.validationService.validateTenantOwnership(
+    tenantId,
+    reservation.rooms.properties.tenant_id
+  );
+
+  this.validationService.validateReservationCanBeCancelled(
+    reservation.status
+  );
+
+  this.validationService.validateTenantCanCancelPayment(
+    reservation.payments?.proof_image
+  );
+
+  this.validationService.validateBookingExpired(
+    reservation.booking_expired_at
+  );
+
+  const cancelledReservation =
+    await this.persistenceService.cancelReservation(
+      reservation
+    );
+
+  return this.mapperService.buildCancelReservationResponse(
+    cancelledReservation
+  );
 }}
 
 //#region Dependencies

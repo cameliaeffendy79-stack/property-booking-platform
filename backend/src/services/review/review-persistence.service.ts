@@ -14,22 +14,27 @@ export class ReviewPersistenceService {
   }
 
   async replyReview(
-    reviewId: number,
-    reply: string
-  ): Promise<reviews> {
-    const review =
-      await this.reviewRepository
-        .updateTenantReply(
-          reviewId,
-          reply
-        );
-
-    await this.reviewRepository
-      .updateRepliedAt(
-        reviewId,
-        new Date()
-      );
-
-    return review;
-  }
+  reviewId: number,
+  reply: string
+): Promise<reviews> {
+  return this.reviewRepository.updateTenantReply(
+    reviewId,
+    reply
+  );
 }
+
+  async editReview(
+  reviewId: number,
+  rating: number,
+  comment: string
+): Promise<reviews> {
+  return this.reviewRepository.updateReview(
+    reviewId,
+    rating,
+    comment
+  );
+}
+
+
+}
+

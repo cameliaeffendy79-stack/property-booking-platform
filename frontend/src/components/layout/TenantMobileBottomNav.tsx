@@ -31,8 +31,8 @@ export function TenantMobileBottomNav() {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white md:hidden">
-      <div className="flex h-16 w-full items-center">
+    <nav className="glass-panel ambient-shadow fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 rounded-2xl border border-slate-200 md:hidden">
+      <div className="flex h-16 w-full items-center px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
 
@@ -40,23 +40,19 @@ export function TenantMobileBottomNav() {
             <NavLink
               key={item.to}
               to={item.to}
-              className={({ isActive }) =>
-                `flex h-full flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors ${
-                  isActive
-                    ? "text-midnight-indigo"
-                    : "text-slate-400 hover:text-midnight-indigo"
-                }`
-              }
+              className="flex h-full flex-1 items-center justify-center"
             >
               {({ isActive }) => (
-                <>
-                  <Icon
-                    size={20}
-                    strokeWidth={isActive ? 2.5 : 2}
-                  />
-
+                <div
+                  className={`flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-[10px] font-medium transition-all active:scale-95 ${
+                    isActive
+                      ? "bg-midnight-indigo/10 text-midnight-indigo"
+                      : "text-slate-400"
+                  }`}
+                >
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                   <span>{item.label}</span>
-                </>
+                </div>
               )}
             </NavLink>
           );

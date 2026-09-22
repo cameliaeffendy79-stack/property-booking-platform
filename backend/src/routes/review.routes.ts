@@ -6,23 +6,31 @@ import { user_role } from "../generated/prisma/enums";
 
 const router = Router();
 
-router.use(
-  authenticate,
-  authorize(user_role.CUSTOMER)
-);
-/**
- * Customer Review
- */
 router.post(
   "/",
+  authenticate,
+  authorize(user_role.CUSTOMER),
   reviewController.createReview
 );
 
-/**
- * Tenant Review
- */
+router.get(
+  "/tenant",
+  authenticate,
+  authorize(user_role.TENANT),
+  reviewController.getTenantReviews
+);
+
+router.patch(
+  "/:id",
+  authenticate,
+  authorize(user_role.CUSTOMER),
+  reviewController.editReview
+);
+
 router.patch(
   "/:id/reply",
+  authenticate,
+  authorize(user_role.TENANT),
   reviewController.replyReview
 );
 

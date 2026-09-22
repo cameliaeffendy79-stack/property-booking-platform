@@ -10,21 +10,41 @@ export type ReservationStatus =
 
 export interface ReservationDetail {
   id: number;
+
   bookingCode: string;
+
   propertyName: string;
+
   roomName: string;
+
   checkInDate: string;
+
   checkOutDate: string;
+
   guestCount: number;
+
   totalPrice: string;
+
   reservationStatus: ReservationStatus;
+
   status?: ReservationStatus;
+
   paymentStatus: PaymentStatus | null;
+
   paymentProof?: string | null;
+
   bankDetails: {
-  bankName: string | null;
-  accountName: string | null;
-  accountNumber: string | null;
+    bankName: string | null;
+    accountName: string | null;
+    accountNumber: string | null;
+  } | null;
+
+  review: {
+  id: number;
+  rating: number;
+  comment: string | null;
+  tenantReply: string | null;
+  repliedAt: string | null;
 } | null;
 }
 

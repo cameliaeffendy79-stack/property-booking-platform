@@ -2,18 +2,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { RatingInput } from "./RatingInput";
-import { createReviewSchema, type CreateReviewFormValues } from "@/validations/review.schema";
+import {
+  createReviewSchema,
+  type CreateReviewFormValues,
+} from "@/validations/review.schema";
 
 interface ReviewFormProps {
   reservationId: number;
-  onSubmit: (
-    values: CreateReviewFormValues
-  ) => void;
+  initialRating?: number;
+  initialComment?: string;
+  submitLabel?: string;
+  submittingLabel?: string;
+  onSubmit: (values: CreateReviewFormValues) => void;
   isSubmitting?: boolean;
 }
 
 export function ReviewForm({
   reservationId,
+  initialRating = 0,
+  initialComment = "",
+  submitLabel = "Submit Review",
+  submittingLabel = "Submitting...",
   onSubmit,
   isSubmitting = false,
 }: ReviewFormProps) {
@@ -27,8 +36,8 @@ export function ReviewForm({
     resolver: zodResolver(createReviewSchema),
     defaultValues: {
       reservationId,
-      rating: 0,
-      comment: "",
+      rating: initialRating,
+      comment: initialComment,
     },
   });
 
@@ -90,7 +99,9 @@ export function ReviewForm({
         disabled={isSubmitting}
         className="w-full rounded-xl bg-slate-900 px-4 py-3 font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isSubmitting ? "Submitting..." : "Submit Review"}
+        {isSubmitting
+          ? submittingLabel
+          : submitLabel}
       </button>
     </form>
   );

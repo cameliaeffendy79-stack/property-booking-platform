@@ -1,7 +1,4 @@
-import {
-  payment_status,
-  reservation_status,
-} from "../../../generated/prisma/client";
+import { reservation_status } from "../../../generated/prisma/client";
 
 export interface ReservationDetailResponseDto {
   message: string;
@@ -25,9 +22,17 @@ export interface ReservationDetailResponseDto {
     paymentProof?: string | null;
 
     bankDetails: {
-    bankName: string | null;
-    accountName: string | null;
-    accountNumber: string | null;
-  } | null;
+      bankName: string | null;
+      accountName: string | null;
+      accountNumber: string | null;
+    } | null;
+
+    review: {
+  id: number;
+  rating: number;
+  comment: string | null;
+  tenantReply: string | null;
+  repliedAt: Date | null;
+} | null;
   };
 }

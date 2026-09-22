@@ -105,6 +105,18 @@ export class ReviewValidationService {
     }
   }
 
+  validateReviewOwnership(
+  userId: number,
+  reviewUserId: bigint
+): void {
+  if (BigInt(userId) !== reviewUserId) {
+    throw new ApiError(
+      403,
+      "You are not allowed to edit this review."
+    );
+  }
+}
+
   /**
    * Validate review exists.
    */

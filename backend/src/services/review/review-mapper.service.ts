@@ -1,5 +1,5 @@
 import { reviews } from "../../generated/prisma/client";
-
+import { EditReviewResponseDto } from "../../types/dto/review/edit-review-response.dto";
 import { CreateReviewResponseDto } from "../../types/dto/review/create-review-response.dto";
 import { ReplyReviewResponseDto } from "../../types/dto/review/reply-review-response.dto";
 
@@ -70,5 +70,40 @@ export class ReviewMapperService {
           review.replied_at,
       },
     };
+  }
+
+  buildEditReviewResponse(
+  review: reviews
+): EditReviewResponseDto {
+  return {
+    message: "Review updated successfully.",
+    data: {
+      id: Number(review.id),
+      reservationId: Number(review.reservation_id),
+      propertyId: Number(review.property_id),
+      userId: Number(review.user_id),
+      rating: review.rating,
+      comment: review.comment,
+      tenantReply: review.tenant_reply,
+      repliedAt: review.replied_at,
+    },
+  };
+}
+
+ buildTenantReviewList(reviews: any[]) {
+    return reviews.map((review) => ({
+      id: Number(review.id),
+      reservationId: Number(review.reservation_id),
+      bookingCode: review.reservations.booking_code,
+      propertyId: Number(review.property_id),
+      propertyName: review.properties.name,
+      userId: Number(review.user_id),
+      customerName: review.users.full_name,
+      rating: review.rating,
+      comment: review.comment,
+      tenantReply: review.tenant_reply,
+      repliedAt: review.replied_at,
+      createdAt: review.created_at,
+    }));
   }
 }

@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+
+import { cancelTenantReservation } from "@/features/reservation/api/reservation.api";
 
 import { TenantMobileHeader } from "@/components/layout/TenantMobileHeader";
 import { TenantHeader } from "@/components/layout/TenantHeader";
@@ -129,6 +132,17 @@ export default function TenantTransactionPage() {
   const rejectMutation =
     useRejectPayment();
 
+  const queryClient = useQueryClient();
+
+  const cancelMutation = useMutation({
+    mutationFn: cancelTenantReservation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tenant-transactions"],
+      });
+    },
+  });
+
   const [selectedProof, setSelectedProof] =
     useState<string | null>(null);
 
@@ -143,7 +157,8 @@ export default function TenantTransactionPage() {
   ) => {
     if (
       confirmMutation.isPending ||
-      rejectMutation.isPending
+      rejectMutation.isPending ||
+      cancelMutation.isPending
     ) {
       return;
     }
@@ -162,7 +177,8 @@ export default function TenantTransactionPage() {
   ) => {
     if (
       confirmMutation.isPending ||
-      rejectMutation.isPending
+      rejectMutation.isPending ||
+      cancelMutation.isPending
     ) {
       return;
     }
@@ -174,6 +190,26 @@ export default function TenantTransactionPage() {
     if (!confirmed) return;
 
     rejectMutation.mutate(reservationId);
+  };
+
+  const handleCancel = (
+    reservationId: number
+  ) => {
+    if (
+      confirmMutation.isPending ||
+      rejectMutation.isPending ||
+      cancelMutation.isPending
+    ) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this reservation?"
+    );
+
+    if (!confirmed) return;
+
+    cancelMutation.mutate(reservationId);
   };
 
   const handleSearchChange = (
@@ -520,9 +556,25 @@ export default function TenantTransactionPage() {
                   expandedBooking === transaction.id;
 
                 const needsAction =
-                  transaction.reservationStatus ===
-                  "WAITING_CONFIRMATION";
+  transaction.reservationStatus ===
+    "WAITING_CONFIRMATION" &&
+  !!transaction.paymentProof;
 
+const canCancel =
+  (transaction.reservationStatus ===
+    "WAITING_PAYMENT" ||
+    transaction.reservationStatus ===
+      "WAITING_CONFIRMATION") &&
+  !transaction.paymentProof;
+
+console.log("TENANT TRANSACTION DEBUG", {
+  id: transaction.id,
+  bookingCode: transaction.bookingCode,
+  reservationStatus: transaction.reservationStatus,
+  paymentStatus: transaction.paymentStatus,
+  paymentProof: transaction.paymentProof,
+  canCancel,
+});
                 return (
                   <SurfaceCard
                     key={transaction.id}
@@ -573,17 +625,38 @@ export default function TenantTransactionPage() {
                             />
                           </div>
 
+                          <div className="flex flex-wrap items-center justify-end gap-2">
+                        {canCancel && (
                           <button
                             type="button"
-                            onClick={() =>
-                              handleToggleBooking(
-                                transaction.id
-                              )
+                            disabled={
+                              confirmMutation.isPending ||
+                              rejectMutation.isPending ||
+                              cancelMutation.isPending
                             }
-                            className="rounded border border-slate-200 bg-white px-4 py-2 text-[10px] font-semibold text-midnight-indigo transition hover:bg-slate-50"
+                            onClick={() =>
+                              handleCancel(transaction.id)
+                            }
+                            className="rounded border border-red-200 bg-white px-4 py-2 text-[10px] font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            Booking Detail
+                            {cancelMutation.isPending
+                              ? "Cancelling..."
+                              : "Cancel Reservation"}
                           </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleToggleBooking(
+                              transaction.id
+                            )
+                          }
+                          className="rounded border border-slate-200 bg-white px-4 py-2 text-[10px] font-semibold text-midnight-indigo transition hover:bg-slate-50"
+                        >
+                          Booking Detail
+                        </button>
+                      </div>
                         </div>
                       </div>
 
@@ -719,46 +792,44 @@ export default function TenantTransactionPage() {
                             </div>
                           </div>
 
-                          {/* Action only for bookings waiting for tenant action */}
+                          {/* Tenant actions */}
                           {needsAction && (
-                            <div className="mt-5 flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/50 p-4 sm:flex-row sm:justify-end">
-                              <button
-                                type="button"
-                                disabled={
-                                  confirmMutation.isPending ||
-                                  rejectMutation.isPending
-                                }
-                                onClick={() =>
-                                  handleReject(
-                                    transaction.id
-                                  )
-                                }
-                                className="rounded border border-red-200 bg-white px-5 py-3 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                {rejectMutation.isPending
-                                  ? "Processing..."
-                                  : "Reject"}
-                              </button>
+                          <div className="mt-5 flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/50 p-4 sm:flex-row sm:justify-end">
+                            <button
+                              type="button"
+                              disabled={
+                                confirmMutation.isPending ||
+                                rejectMutation.isPending ||
+                                cancelMutation.isPending
+                              }
+                              onClick={() =>
+                                handleReject(transaction.id)
+                              }
+                              className="rounded border border-red-200 bg-white px-5 py-3 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              {rejectMutation.isPending
+                                ? "Processing..."
+                                : "Reject"}
+                            </button>
 
-                              <button
-                                type="button"
-                                disabled={
-                                  confirmMutation.isPending ||
-                                  rejectMutation.isPending
-                                }
-                                onClick={() =>
-                                  handleConfirm(
-                                    transaction.id
-                                  )
-                                }
-                                className="rounded bg-sunrise-amber px-5 py-3 text-xs font-semibold text-slate-text transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                {confirmMutation.isPending
-                                  ? "Processing..."
-                                  : "Approve"}
-                              </button>
-                            </div>
-                          )}
+                            <button
+                              type="button"
+                              disabled={
+                                confirmMutation.isPending ||
+                                rejectMutation.isPending ||
+                                cancelMutation.isPending
+                              }
+                              onClick={() =>
+                                handleConfirm(transaction.id)
+                              }
+                              className="rounded bg-sunrise-amber px-5 py-3 text-xs font-semibold text-slate-text transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              {confirmMutation.isPending
+                                ? "Processing..."
+                                : "Approve"}
+                            </button>
+                          </div>
+                        )}
                         </>
                       )}
                     </div>

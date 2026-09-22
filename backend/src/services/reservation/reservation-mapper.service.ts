@@ -58,58 +58,87 @@ export class ReservationMapperService {
   }
 
   buildReservationDetailResponse(
-    reservation: ReservationComplete
-  ): ReservationDetailResponseDto {
-    return {
-      message:
-        "Reservation detail retrieved successfully.",
+  reservation: ReservationComplete
+): ReservationDetailResponseDto {
+  return {
+    message:
+      "Reservation detail retrieved successfully.",
 
-      data: {
-        id:
-          Number(reservation.id),
+    data: {
+      id:
+        Number(reservation.id),
 
-        bookingCode:
-          reservation.booking_code,
+      bookingCode:
+        reservation.booking_code,
 
-        propertyName:
-          reservation.rooms.properties.name,
+      propertyName:
+        reservation.rooms.properties.name,
 
-        roomName:
-          reservation.rooms.room_name,
+      roomName:
+        reservation.rooms.room_name,
 
-        checkInDate:
-          reservation.check_in,
+      checkInDate:
+        reservation.check_in,
 
-        checkOutDate:
-          reservation.check_out,
+      checkOutDate:
+        reservation.check_out,
 
-        guestCount:
-          reservation.guest_count,
+      guestCount:
+        reservation.guest_count,
 
-        totalPrice:
-          reservation.total_price.toString(),
+      totalPrice:
+        reservation.total_price.toString(),
 
-        reservationStatus:
+      reservationStatus:
         this.mapReservationStatus(
-            reservation.status),
+          reservation.status
+        ),
 
+      paymentProof:
+        reservation.payments?.proof_image ?? null,
 
+      bankDetails:
+        reservation.rooms.properties.users
+          .tenant_profiles
+          ? {
+              bankName:
+                reservation.rooms.properties
+                  .users.tenant_profiles.bank_name,
 
-        paymentProof:
-          reservation.payments?.proof_image ?? null,
+              accountName:
+                reservation.rooms.properties
+                  .users.tenant_profiles
+                  .bank_account_name,
 
-        bankDetails: reservation.rooms.properties.users.tenant_profiles? {
-            bankName:
-              reservation.rooms.properties.users.tenant_profiles.bank_name,
-            accountName:
-              reservation.rooms.properties.users.tenant_profiles.bank_account_name,
-            accountNumber:
-              reservation.rooms.properties.users.tenant_profiles.bank_account_number,
-          }
-        : null,
-      },
-    };
-  }
+              accountNumber:
+                reservation.rooms.properties
+                  .users.tenant_profiles
+                  .bank_account_number,
+            }
+          : null,
+
+      review:
+        reservation.reviews
+          ? {
+              id:
+                Number(reservation.reviews.id),
+
+              rating:
+                reservation.reviews.rating,
+
+              comment:
+                reservation.reviews.comment,
+
+              tenantReply:
+                reservation.reviews.tenant_reply,
+
+              repliedAt:
+                reservation.reviews.replied_at,
+            }
+          : null,
+    },
+  };
+}
 
   private mapReservationStatus(
   status: reservation_status | null

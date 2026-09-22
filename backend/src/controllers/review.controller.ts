@@ -5,8 +5,15 @@ import { ApiError } from "../utils";
 import {
   createReviewSchema,
 } from "../validations/review/create-review.validation";
-import {  replyReviewSchema } from "../validations/review/reply-review.validation";
-import { reviewService } from "../services/review/review.service";
+import {
+  replyReviewSchema,
+} from "../validations/review/reply-review.validation";
+import {
+  reviewService,
+} from "../services/review/review.service";
+import {
+  editReviewSchema,
+} from "../validations/review/edit-review.validation";
 
 export class ReviewController {
   //#region Customer
@@ -25,11 +32,6 @@ export class ReviewController {
             req.body.comment,
         });
 
-      /**
-       * Temporary.
-       * Will be replaced with req.user.id
-       * after Authentication Middleware is completed.
-       */
       const userId =
         Number(req.user!.id);
 
@@ -59,17 +61,85 @@ export class ReviewController {
     }
   );
 
+  editReview = asyncHandler(
+    async (req: Request, res: Response) => {
+      const userId =
+        Number(req.user!.id);
+
+      if (
+        Number.isNaN(userId) ||
+        userId <= 0
+      ) {
+        throw new ApiError(
+          400,
+          "User ID is required."
+        );
+      }
+
+      const dto =
+        editReviewSchema.parse({
+          reviewId:
+            Number(req.params.id),
+
+          rating:
+            Number(req.body.rating),
+
+          comment:
+            req.body.comment,
+        });
+
+      const result =
+        await reviewService.editReview(
+          userId,
+          dto
+        );
+
+      return res.status(200).json(
+        new ApiResponse(
+          true,
+          result.message,
+          result.data
+        )
+      );
+    }
+  );
+
   //#endregion
 
   //#region Tenant
 
+  getTenantReviews = asyncHandler(
+    async (req: Request, res: Response) => {
+      const tenantId =
+        Number(req.user!.id);
+
+      if (
+        Number.isNaN(tenantId) ||
+        tenantId <= 0
+      ) {
+        throw new ApiError(
+          400,
+          "Tenant ID is required."
+        );
+      }
+
+      const result =
+        await reviewService.getTenantReviews(
+          tenantId
+        );
+
+      return res.status(200).json(
+        new ApiResponse(
+          true,
+          "Tenant reviews retrieved successfully.",
+          result
+        )
+      );
+    }
+  );
+
   replyReview = asyncHandler(
     async (req: Request, res: Response) => {
-      /**
-       * Temporary.
-       * Will be replaced with req.user.id
-       * after Authentication Middleware is completed.
-       */
       const tenantId =
         Number(req.user!.id);
 
