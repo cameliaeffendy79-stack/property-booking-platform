@@ -64,7 +64,7 @@ export default function ReviewPage() {
   const handleEdit = async (
     values: CreateReviewFormValues,
   ) => {
-    if (!reservation?.review) {
+    if (!reservation?.review?.tenantReply) {
       return;
     }
 
@@ -114,8 +114,20 @@ export default function ReviewPage() {
         }
       />
     );
+    
   }
-
+  if (reservation?.review?.tenantReply) {
+    return (
+      <PageMessage
+      title="Review tidak dapat di edit"
+      message="Review ini sudah di balas oleh tenant"
+      buttonText="Kembali ke Reservation"
+      onClick={() =>
+          navigate(`/reservations/${parsedId}`)
+        }
+        />
+    )
+  }
   if (reservation.review && !isEditMode) {
     return (
       <ReviewDetails

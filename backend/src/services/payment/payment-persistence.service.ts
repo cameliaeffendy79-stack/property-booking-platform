@@ -66,34 +66,35 @@ export class PaymentPersistenceService {
   }
 
   async rejectPayment(
-    reservationId: number
-  ): Promise<payments> {
-    return prisma.$transaction(
-      async (tx) => {
-        const payment =
-          await tx.payments.update({
-            where: {
-              reservation_id: BigInt(
-                reservationId
-              ),
-            },
-            data: {
-              status: payment_status.REJECTED,
-            },
-          });
-
-        await tx.reservations.update({
+  reservationId: number
+): Promise<payments> {
+  return prisma.$transaction(
+    async (tx) => {
+      const payment =
+        await tx.payments.update({
           where: {
-            id: BigInt(reservationId),
+            reservation_id: BigInt(
+              reservationId
+            ),
           },
           data: {
-            status:
-              reservation_status.WAITING_PAYMENT,
+            status: payment_status.PENDING,
+            proof_image: null,
           },
         });
 
-        return payment;
-      }
-    );
-  }
+      await tx.reservations.update({
+        where: {
+          id: BigInt(reservationId),
+        },
+        data: {
+          status:
+            reservation_status.WAITING_PAYMENT,
+        },
+      });
+
+      return payment;
+    }
+  );
+}
 }
